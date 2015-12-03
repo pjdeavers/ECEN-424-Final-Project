@@ -1,0 +1,55 @@
+package client;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.Scanner;
+
+/**
+ * Created by Patrick on 10/22/2015.
+ */
+public class SDClientMain {
+
+
+    public static void main(String args[]) throws Exception
+    {
+
+        Scanner input = new Scanner(System.in);
+        int portNumber = 0;
+        String ipAddress = "localhost";
+
+        System.out.print("Enter IP Address: ");
+        ipAddress = input.next();
+
+        System.out.print("Enter Port Number: ");
+        portNumber = input.nextInt();
+
+        String userIn = "howdy";
+        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
+        Socket clientSocket = new Socket(ipAddress, portNumber);
+
+        String serverMessage;
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        System.out.print("Server says: ");
+        while ((serverMessage = inFromServer.readLine()) != null) {
+            System.out.println(serverMessage);
+            break;
+        }
+
+        DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+        input.nextLine();
+
+
+        while (!userIn.equals("\\disconnect")) {
+            System.out.println("Type a message for server. To exit, type \\disconnect ");
+            userIn = inFromUser.readLine();
+            outToServer.writeBytes(userIn + '\n');
+            if (userIn.equals("\\disconnect")) {
+                System.out.println("Connection closed \nExiting");
+                break;
+            }
+        }
+
+        clientSocket.close();
+    }
+
+}
